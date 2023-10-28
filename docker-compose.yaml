@@ -1,0 +1,16 @@
+version: '3.3'
+
+services:
+  urls_db:
+    image: postgres:15.3-alpine
+    container_name: urls-db
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - urls_postgres_volume:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+    restart: unless-stopped
+
+volumes:
+  urls_postgres_volume:
