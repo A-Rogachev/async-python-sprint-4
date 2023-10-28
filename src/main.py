@@ -23,14 +23,23 @@ app.include_router(base.api_router, prefix="/api/v1")
 
 
 if __name__ == '__main__':
-    from sqlalchemy.ext.asyncio import create_async_engine
-    from sqlalchemy.orm import declarative_base
 
-    Base = declarative_base()
+    # # Создание таблиц вручную
+    # from sqlalchemy.ext.asyncio import create_async_engine
+    # from sqlalchemy.orm import declarative_base
+    # import asyncio
+    # from models.short_url import ShortUrl
+    # from sqlalchemy.util import immutabledict
 
-    engine = create_async_engine(app_settings.database_dsn, echo=True)
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
+    # Base = declarative_base()
+    # tables = immutabledict({'short_urls': ShortUrl.__table__})
+    # Base.metadata.tables = tables
+    # engine = create_async_engine(str(app_settings.database_dsn), echo=True)
+    # async def init_models():
+    #     async with engine.begin() as conn:
+    #         await conn.run_sync(Base.metadata.drop_all)
+    #         await conn.run_sync(Base.metadata.create_all)
+    # asyncio.run(init_models())
 
     uvicorn.run(
         'main:app',
