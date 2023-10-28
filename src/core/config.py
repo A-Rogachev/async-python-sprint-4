@@ -1,12 +1,12 @@
+from dotenv import load_dotenv
 from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings
-from dotenv import load_dotenv
 
 load_dotenv()
 
 class AppSettings(BaseSettings):
-    app_title: str = "NameByDefault"
-    # database_dsn: PostgresDsn
+    app_title: str = 'URL Shortener'
+    database_dsn: PostgresDsn
 
     class Config:
         env_file = '.env'
