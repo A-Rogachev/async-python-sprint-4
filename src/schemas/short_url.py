@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class ShortUrlBase(BaseModel):
-    title: str
+    pass
 
 class ShortUrlCreate(ShortUrlBase):
     pass
@@ -22,11 +22,11 @@ class ShortUrlInDBBase(ShortUrlBase):
     clicks: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
-class ShortUrl(ShortUrlInDBBase):
-    pass
+class OriginalUrl(ShortUrlBase):
+    original_url: str
 
 class ShortUrlInDB(ShortUrlInDBBase):
     pass
