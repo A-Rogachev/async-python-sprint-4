@@ -49,7 +49,7 @@ class RepositoryDB(Repository, Generic[ModelType, CreateSchemaType, UpdateSchema
 
 class ShortUrlRepositoryDB(RepositoryDB, Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def get_by_short_url(self, db: AsyncSession, short_url: str) -> Optional[ModelType]:
-        statement = select(self._model).where(self._model.shorten_url_id == short_url)
+        statement = select(self._model).where(self._model.shorten_url == short_url)
         results = await db.execute(statement=statement)
         return results.scalar_one_or_none()
 

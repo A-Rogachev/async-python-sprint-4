@@ -16,7 +16,7 @@ class ShortUrlUpdate(ShortUrlBase):
 
 class ShortUrlInDBBase(ShortUrlBase):
     original_url: str
-    shorten_url_id: str
+    shorten_url: str
     created_at: datetime
     deleted_at: Optional[datetime]
     clicks: int
