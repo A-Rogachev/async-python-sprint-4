@@ -8,13 +8,16 @@ class ShortUrlBase(BaseModel):
     pass
 
 class ShortUrlCreate(ShortUrlBase):
-    pass
+    original_url: str
+    shorten_url: str
+    password_for_deleting: str
 
 class ShortUrlUpdate(ShortUrlBase):
     pass
 
 
 class ShortUrlInDBBase(ShortUrlBase):
+    id: int
     original_url: str
     shorten_url: str
     created_at: datetime
