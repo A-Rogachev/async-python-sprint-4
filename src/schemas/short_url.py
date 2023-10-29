@@ -8,12 +8,20 @@ class ShortUrlBase(BaseModel):
     pass
 
 class ShortUrlCreate(ShortUrlBase):
+    """
+    Схема, используемая при создании нового сокращенного URL.
+    """
     original_url: str
     shorten_url: str
     password_for_deleting: str
 
-class ShortUrlUpdate(ShortUrlBase):
-    pass
+
+class ShortUrlDelete(ShortUrlBase):
+    """
+    Схема, используемая при удалении сокращенного URL.
+    """
+    shorten_url: str
+    password_for_deleting: str
 
 
 class ShortUrlInDBBase(ShortUrlBase):
@@ -30,6 +38,3 @@ class ShortUrlInDBBase(ShortUrlBase):
 
 class OriginalUrl(ShortUrlBase):
     original_url: str
-
-class ShortUrlInDB(ShortUrlInDBBase):
-    pass

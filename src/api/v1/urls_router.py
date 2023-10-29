@@ -1,6 +1,7 @@
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from passlib.hash import sha256_crypt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.db import get_session
@@ -19,17 +20,17 @@ async def get_original_url(
     """
     Вернуть оригинальный URL.
     """
-    original_url: str = await short_url_crud.get_by_short_url(db=db, short_url=short_url)
-    if not original_url:
+    obj_from_db = await short_url_crud.get_by_short_url(db=db, short_url=short_url)
+    if not obj_from_db:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Item not found',
         )
-    return original_url
+    return obj_from_db
 
 
 @urls_router.post(
-    "/",
+    '/',
     response_model=short_url_schema.ShortUrlInDB,
     status_code=status.HTTP_201_CREATED,
 )
@@ -41,5 +42,36 @@ async def create_shorten_url(
     """
     Создание новой записи сокращенной ссылки.
     """
+    encrypted_password = sha256_crypt.hash(short_url_in.password_for_deleting)
+    short_url_in.password_for_deleting = encrypted_password
     new_record = await short_url_crud.create(db=db, obj_in=short_url_in)
     return new_record
+
+
+@urls_router.delete(
+    '/',
+    status_code=status.HTTP_410_GONE,
+)
+async def delete_shorten_url(
+    *,
+    db: AsyncSession = Depends(get_session),
+    short_url_del: short_url_schema.ShortUrlDelete,
+) -> Any:
+    """
+    Удаление существующей записи.
+    """
+    obj_from_db = await short_url_crud.get_by_short_url(
+        db=db,
+        short_url=short_url_del.shorten_url,
+    )
+    if not obj_from_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Item not found',
+        )
+    else:
+        await short_url_crud.delete(
+            db=db,
+            obj_from_db=obj_from_db,
+            obj_del_schema=short_url_del,
+        )

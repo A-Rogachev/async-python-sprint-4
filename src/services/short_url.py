@@ -1,10 +1,10 @@
 from models.short_url import ShortUrl as ShortUrlModel
-from schemas.short_url import ShortUrlCreate, ShortUrlUpdate
+from schemas.short_url import ShortUrlCreate, ShortUrlDelete
 
 from .base import ShortUrlRepositoryDB
 
 
-class RepositoryShortUrl(ShortUrlRepositoryDB[ShortUrlModel, ShortUrlCreate, ShortUrlUpdate]):
+class RepositoryShortUrl(ShortUrlRepositoryDB[ShortUrlModel, ShortUrlCreate, ShortUrlDelete]):
     """
     Бизнес логика для модели ShortUrl.
     """
