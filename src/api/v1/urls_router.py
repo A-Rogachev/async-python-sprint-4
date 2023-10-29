@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from passlib.hash import sha256_crypt
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -75,3 +75,4 @@ async def delete_shorten_url(
             obj_from_db=obj_from_db,
             obj_del_schema=short_url_del,
         )
+        return Response(status_code=status.HTTP_204_NO_CONTENT)

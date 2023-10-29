@@ -1,5 +1,7 @@
+from datetime import datetime
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
+from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from passlib.hash import sha256_crypt
 from pydantic import BaseModel
@@ -42,9 +44,17 @@ class ShortUrlRepositoryDB(Repository, Generic[ModelType, CreateSchemaType, Dele
         """
         Получение оригинального URL по его короткому URL.
         """
-        statement = select(self._model).where(self._model.shorten_url == short_url)
+        statement = select(self._model).where(
+            self._model.shorten_url == short_url,
+        )
         results = await db.execute(statement=statement)
-        return results.scalar_one_or_none()
+        obj_in_db = results.scalar_one_or_none()
+        if obj_in_db and obj_in_db.deleted_at:
+            raise HTTPException(
+                status_code=status.HTTP_410_GONE,
+                detail='Item has been deleted.',
+            )
+        return obj_in_db
 
     async def create(self, db: AsyncSession, *, obj_in: CreateSchemaType) -> ModelType:
         """
@@ -57,18 +67,24 @@ class ShortUrlRepositoryDB(Repository, Generic[ModelType, CreateSchemaType, Dele
         await db.refresh(db_obj)
         return db_obj
 
-    async def delete(self, db: AsyncSession, *, obj_del: DeleteSchemaType) -> ModelType:
+    async def delete(
+        self,
+        db: AsyncSession,
+        obj_from_db: ModelType,
+        obj_del_schema: DeleteSchemaType,
+    ) -> None:
         """
         Удаление записи.
         Для удаления записи требуется кодовое слово, записанное при создании.
         """
-
-        db_obj = await self.get_by_short_url(db=db, short_url=obj_del.shorten_url)
-        if sha256_crypt.verify(delete_code, db_obj.delete_code):
-            # Delete the record from the database
-            db.delete(db_obj)
+        if sha256_crypt.verify(
+            obj_del_schema.password_for_deleting,
+            obj_from_db.password_for_deleting,
+        ):
+            obj_from_db.deleted_at = datetime.now()
             await db.commit()
-
-            return db_obj
         else:
-            return None
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='Wrong password for deleting',
+            )

@@ -24,7 +24,7 @@ class ShortUrlDelete(ShortUrlBase):
     password_for_deleting: str
 
 
-class ShortUrlInDBBase(ShortUrlBase):
+class ShortUrlInDB(ShortUrlBase):
     id: int
     original_url: str
     shorten_url: str
