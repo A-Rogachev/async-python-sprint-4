@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Request
 from fastapi.encoders import jsonable_encoder
 from passlib.hash import sha256_crypt
 from pydantic import BaseModel
@@ -88,3 +88,21 @@ class ShortUrlRepositoryDB(Repository, Generic[ModelType, CreateSchemaType, Dele
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail='Wrong password for deleting',
             )
+
+    async def update_clicks_and_info(
+        self,
+        db: AsyncSession,
+        obj_from_db: ModelType,
+        client_ip: str,
+    ) -> None:
+        """
+        Обновление количества кликов и информации.
+        """
+        obj_from_db.total_clicks += 1
+        full_info = obj_from_db.full_info
+        if not full_info:
+            full_info = {}
+        full_info[datetime.now().isoformat()] = client_ip
+        print(full_info)
+        obj_from_db.full_info.update(full_info)
+        await db.commit()

@@ -30,12 +30,14 @@ class BlacklistMiddleware:
 
         headers = Headers(scope=scope)
         host: str = headers.get('host', '').split(':')[0]
+        response = None
         if host in self.blacklist:
             response = PlainTextResponse(
                 'Sorry, your host in blacklist.',
                 status_code=400,
             )
+        
+        if response is not None:
+            await response(scope, receive, send)
         else:
             await self.app(scope, receive, send)
-
-        await response(scope, receive, send)

@@ -14,6 +14,7 @@ class ShortUrlCreate(ShortUrlBase):
     original_url: str
     shorten_url: str
     password_for_deleting: str
+    clicks: int
 
 
 class ShortUrlDelete(ShortUrlBase):

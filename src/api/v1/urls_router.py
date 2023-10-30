@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from passlib.hash import sha256_crypt
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +13,7 @@ urls_router = APIRouter()
 
 @urls_router.get('/{short_url}', response_model=short_url_schema.OriginalUrl)
 async def get_original_url(
+    request: Request,
     *,
     db: AsyncSession = Depends(get_session),
     short_url: str
@@ -26,6 +27,11 @@ async def get_original_url(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Item not found',
         )
+    await short_url_crud.update_clicks_and_info(
+        db=db,
+        obj_from_db=obj_from_db,
+        client_ip=request.client.host,
+    )
     return obj_from_db
 
 
