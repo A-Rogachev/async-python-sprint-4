@@ -4,19 +4,17 @@ from fastapi.responses import ORJSONResponse
 from api.v1 import base
 import uvicorn
 from core.logger import LOGGING
-from middleware import blacklist_middleware, BlackListMiddleware
+from middleware import BlacklistMiddleware
 
 
 app = FastAPI(
     title=app_settings.app_title,
-    docs_url="/api/openapi",
-    openapi_url="/api/openapi.json",
+    docs_url='/api/openapi',
+    openapi_url='/api/openapi.json',
     default_response_class=ORJSONResponse,
 )
-
-black_list = BlackListMiddleware(blasklist=app_settings.blacklist)
-app.add_middleware(blacklist_middleware, black_list)
-app.include_router(base.api_router, prefix="/api/v1") 
+app.add_middleware(BlacklistMiddleware, blacklist=app_settings.blacklist)
+app.include_router(base.api_router, prefix='/api/v1') 
 
 # 2. клики по переходу на урл
 # 4. Docker compose и README

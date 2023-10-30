@@ -1,34 +1,41 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-import ipaddress
+import typing
+
+from starlette.datastructures import Headers
+from starlette.responses import PlainTextResponse
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 
-class BlackListMiddleware(BaseModel):
-    blasklist: list[str]
+class BlacklistMiddleware:
+    """
+    Middleware, блокирующий доступ к сервису из запрещённых подсетей.
+    За основу взят TrustedHostMiddleware.
+    """
+    def __init__(
+        self,
+        app: ASGIApp,
+        blacklist: typing.Optional[typing.Sequence[str]] = None,
+    ) -> None:
+        """
+        Инициализация middleware.
+        """
+        if blacklist is None:
+            blacklist = []
+        self.app = app
+        self.blacklist = list(blacklist)
 
-async def blacklist_middleware(
-    app: FastAPI,
-    blacklist: BlackListMiddleware,
-):
-    async def middleware(request: Request, call_next):
-        client_ip = request.client.host
-        for network in blacklist.blacklist:
-            if ipaddress.ip_address(client_ip) in ipaddress.ip_network(network):
-                return JSONResponse(
-                    status_code=403,
-                    content={'message': 'Forbidden'}
-                )
-        response = await call_next(request)
-        return response
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope['type'] not in ('http', 'websocket'):
+            await self.app(scope, receive, send)
+            return
 
-    async def on_startup():
-        app.middleware_stack.push(middleware)
+        headers = Headers(scope=scope)
+        host: str = headers.get('host', '').split(':')[0]
+        if host in self.blacklist:
+            response = PlainTextResponse(
+                'Sorry, your host in blacklist.',
+                status_code=400,
+            )
+        else:
+            await self.app(scope, receive, send)
 
-    async def on_shutdown():
-        app.middleware_stack.remove(middleware)
-
-    return {
-        "on_startup": on_startup,
-        "on_shutdown": on_shutdown,
-    }
+        await response(scope, receive, send)
