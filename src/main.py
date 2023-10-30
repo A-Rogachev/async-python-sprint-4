@@ -15,7 +15,6 @@ app = FastAPI(
 app.include_router(base.api_router, prefix="/api/v1") 
 
 
-# 1. Доступность бд
 # 2. клики по переходу на урл
 # 3. middleware блокирует доступ из запрещенных подсетей.
 # 4. Docker compose и README
