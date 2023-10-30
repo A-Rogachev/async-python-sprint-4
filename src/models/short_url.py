@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Integer
+from sqlalchemy import Column, String, DateTime, Integer, JSON
 
 from .base import Base
 
@@ -12,5 +12,6 @@ class ShortUrl(Base):
     shorten_url = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     deleted_at = Column(DateTime, nullable=True, default=None)
-    clicks = Column(Integer, nullable=False, default=0)
+    total_clicks = Column(Integer, nullable=False, default=0)
+    full_info = Column(JSON, nullable=True)
     password_for_deleting = Column(String, nullable=False)
