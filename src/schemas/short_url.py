@@ -14,8 +14,6 @@ class ShortUrlCreate(ShortUrlBase):
     original_url: str
     shorten_url: str
     password_for_deleting: str
-    clicks: int
-
 
 class ShortUrlDelete(ShortUrlBase):
     """
@@ -30,8 +28,6 @@ class ShortUrlInDB(ShortUrlBase):
     original_url: str
     shorten_url: str
     created_at: datetime
-    deleted_at: Optional[datetime]
-    clicks: int
 
     class Config:
         from_attributes = True
