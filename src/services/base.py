@@ -5,7 +5,7 @@ from fastapi import HTTPException, status, Request
 from fastapi.encoders import jsonable_encoder
 from passlib.hash import sha256_crypt
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.base import Base
@@ -99,10 +99,12 @@ class ShortUrlRepositoryDB(Repository, Generic[ModelType, CreateSchemaType, Dele
         Обновление количества кликов и информации.
         """
         obj_from_db.total_clicks += 1
+        if not obj_from_db.full_info:
+            obj_from_db.full_info = {}
         full_info = obj_from_db.full_info
-        if not full_info:
-            full_info = {}
-        full_info[datetime.now().isoformat()] = client_ip
-        print(full_info)
-        obj_from_db.full_info.update(full_info)
+        full_info.update({datetime.now().strftime("%Y-%m-%d %H:%M:%S"): client_ip})
+        statement = update(self._model).where(
+            self._model.id == obj_from_db.id,
+        ).values(full_info=full_info)
+        await db.execute(statement=statement)
         await db.commit()
