@@ -12,5 +12,16 @@ services:
       - ./.env
     restart: unless-stopped
 
+  # backend_app:
+  #   image: ./fastapi_app
+  #   container_name: backend-app
+  #   ports:
+  #     - '127.0.0.1:8000:8000'
+  #   depends_on:
+  #     - urls_db
+  #   env_file:
+  #     - ./.env
+  #   restart: unless-stopped
+
 volumes:
   urls_postgres_volume:
