@@ -40,12 +40,12 @@ class ShortUrlRepositoryDB(Repository, Generic[ModelType, CreateSchemaType, Dele
     def __init__(self, model: Type[ModelType]):
         self._model = model
 
-    async def get_by_short_url(self, db: AsyncSession, short_url: str) -> Optional[ModelType]:
+    async def get_by_id(self, db: AsyncSession, short_url_id: int) -> Optional[ModelType]:
         """
         Получение оригинального URL по его короткому URL.
         """
         statement = select(self._model).where(
-            self._model.shorten_url == short_url,
+            self._model.id == short_url_id,
         )
         results = await db.execute(statement=statement)
         obj_in_db = results.scalar_one_or_none()

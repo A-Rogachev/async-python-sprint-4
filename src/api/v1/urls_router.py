@@ -1,6 +1,7 @@
-from typing import Any
+from typing import Any, Optional, Union
 
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
+from fastapi import APIRouter, Depends, HTTPException, Response, Request, Query
+from fastapi import status as fs_status
 from passlib.hash import sha256_crypt
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,34 +12,45 @@ from services.short_url import short_url_crud
 urls_router = APIRouter()
 
 
-@urls_router.get('/{short_url}', response_model=short_url_schema.OriginalUrl)
+@urls_router.get(
+    '/{short_url_id}/',
+    response_model=dict[str, Any],
+)
 async def get_original_url(
     request: Request,
-    *,
+    short_url_id: int,
     db: AsyncSession = Depends(get_session),
-    short_url: str
+    status: Optional[str] = None,
 ) -> Any:
     """
     Вернуть оригинальный URL.
     """
-    obj_from_db = await short_url_crud.get_by_short_url(db=db, short_url=short_url)
+    obj_from_db = await short_url_crud.get_by_id(db=db, short_url_id=short_url_id)
     if not obj_from_db:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=fs_status.HTTP_404_NOT_FOUND,
             detail='Item not found',
         )
-    await short_url_crud.update_clicks_and_info(
-        db=db,
-        obj_from_db=obj_from_db,
-        client_ip=request.client.host,
-    )
-    return obj_from_db
-
+    else:
+        if status == 'full_info':
+            
+            return short_url_schema.FullInfoUrl(
+                **obj_from_db.__dict__
+            ).model_dump()
+        else:
+            await short_url_crud.update_clicks_and_info(
+                db=db,
+                obj_from_db=obj_from_db,
+                client_ip=request.client.host,
+            )
+            return short_url_schema.OriginalUrl(
+                **obj_from_db.__dict__
+            ).model_dump()
 
 @urls_router.post(
     '/',
     response_model=short_url_schema.ShortUrlInDB,
-    status_code=status.HTTP_201_CREATED,
+    status_code=fs_status.HTTP_201_CREATED,
 )
 async def create_shorten_url(
     *,
@@ -56,7 +68,7 @@ async def create_shorten_url(
 
 @urls_router.delete(
     '/',
-    status_code=status.HTTP_410_GONE,
+    status_code=fs_status.HTTP_410_GONE,
 )
 async def delete_shorten_url(
     *,
@@ -72,7 +84,7 @@ async def delete_shorten_url(
     )
     if not obj_from_db:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=fs_status.HTTP_404_NOT_FOUND,
             detail='Item not found',
         )
     else:
@@ -81,4 +93,5 @@ async def delete_shorten_url(
             obj_from_db=obj_from_db,
             obj_del_schema=short_url_del,
         )
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return Response(status_code=fs_status.HTTP_204_NO_CONTENT)
+
