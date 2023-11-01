@@ -1,9 +1,9 @@
-from core.config import app_settings
+import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+
 from api.v1 import base
-import uvicorn
-from core.logger import LOGGING
+from core.config import app_settings
 from middleware import BlacklistMiddleware
 
 
@@ -40,5 +40,4 @@ if __name__ == '__main__':
         host='0.0.0.0',
         port=8000,
         reload=True,
-        # log_config=LOGGING,
     )

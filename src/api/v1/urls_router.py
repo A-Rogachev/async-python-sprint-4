@@ -34,20 +34,18 @@ async def get_original_url(
             status_code=fs_status.HTTP_404_NOT_FOUND,
             detail='Item not found',
         )
-    else:
-        if status == 'full_info':
-            return short_url_schema.FullInfoUrl(
-                **obj_from_db.__dict__
-            ).model_dump()
-        else:
-            await short_url_crud.update_clicks_and_info(
-                db=db,
-                obj_from_db=obj_from_db,
-                client_ip=request.client.host,
-            )
-            return short_url_schema.OriginalUrl(
-                **obj_from_db.__dict__
-            ).model_dump()
+    if status == 'full_info':
+        return short_url_schema.FullInfoUrl(
+            **obj_from_db.__dict__
+        ).model_dump()
+    await short_url_crud.update_clicks_and_info(
+        db=db,
+        obj_from_db=obj_from_db,
+        client_ip=request.client.host,
+    )
+    return short_url_schema.OriginalUrl(
+        **obj_from_db.__dict__
+    ).model_dump()
 
 
 @urls_router.post(
@@ -71,7 +69,7 @@ async def create_shorten_url(
     )
     if existing_record:
         raise HTTPException(
-            status_code=400,
+            status_code=fs_status.HTTP_400_BAD_REQUEST,
             detail='Record with the same name already exists'
         )
 

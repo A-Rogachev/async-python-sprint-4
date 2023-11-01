@@ -1,5 +1,6 @@
 import typing
 
+from fastapi import status as fs_status
 from starlette.datastructures import Headers
 from starlette.responses import PlainTextResponse
 from starlette.types import ASGIApp, Receive, Scope, Send
@@ -39,7 +40,7 @@ class BlacklistMiddleware:
         if host in self.blacklist:
             response = PlainTextResponse(
                 'Sorry, your host in blacklist.',
-                status_code=400,
+                status_code=fs_status.HTTP_400_BAD_REQUEST,
             )
         
         if response is not None:

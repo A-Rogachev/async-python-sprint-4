@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi import status as fs_status
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
 from sqlalchemy import text
@@ -28,10 +29,10 @@ async def ping(db: AsyncSession = Depends(get_session)):
         await db.execute(text('SELECT 1'))
         return ORJSONResponse(
             content={'status': 'database is available'},
-            status_code=200,
+            status_code=fs_status.HTTP_200_OK,
         )
     except Exception as error:
         return ORJSONResponse(
             content={'status': f'database is not available: {error}'},
-            status_code=500,
+            status_code=fs_status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
