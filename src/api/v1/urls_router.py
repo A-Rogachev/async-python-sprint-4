@@ -1,6 +1,6 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Response, Request, Query
+from fastapi import APIRouter, Depends, HTTPException, Response, Request
 from fastapi import status as fs_status
 from passlib.hash import sha256_crypt
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,7 +25,10 @@ async def get_original_url(
     """
     Вернуть оригинальный URL.
     """
-    obj_from_db = await short_url_crud.get_by_id(db=db, short_url_id=short_url_id)
+    obj_from_db = await short_url_crud.get_by_id(
+        db=db,
+        short_url_id=short_url_id,
+    )
     if not obj_from_db:
         raise HTTPException(
             status_code=fs_status.HTTP_404_NOT_FOUND,
@@ -33,7 +36,6 @@ async def get_original_url(
         )
     else:
         if status == 'full_info':
-            
             return short_url_schema.FullInfoUrl(
                 **obj_from_db.__dict__
             ).model_dump()
@@ -46,6 +48,7 @@ async def get_original_url(
             return short_url_schema.OriginalUrl(
                 **obj_from_db.__dict__
             ).model_dump()
+
 
 @urls_router.post(
     '/',
@@ -94,4 +97,3 @@ async def delete_shorten_url(
             obj_del_schema=short_url_del,
         )
         return Response(status_code=fs_status.HTTP_204_NO_CONTENT)
-

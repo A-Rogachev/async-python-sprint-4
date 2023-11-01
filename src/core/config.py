@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings
 
 load_dotenv()
 
+
 class AppSettings(BaseSettings):
     app_title: str = 'URL Shortener'
     database_dsn: PostgresDsn

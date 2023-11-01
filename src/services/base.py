@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
+from typing import Generic, Optional, Type, TypeVar
 
-from fastapi import HTTPException, status, Request
+from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from passlib.hash import sha256_crypt
 from pydantic import BaseModel
@@ -30,17 +30,23 @@ class Repository:
         raise NotImplementedError
 
     def delete(self, *args, **kwargs):
-        raise NotImplementedError 
+        raise NotImplementedError
 
 
-class ShortUrlRepositoryDB(Repository, Generic[ModelType, CreateSchemaType, DeleteSchemaType]):
+class ShortUrlRepositoryDB(
+    Repository,
+    Generic[ModelType, CreateSchemaType, DeleteSchemaType],
+):
     """
     Репозиторий для работы с моделью ShortUrl.
     """
     def __init__(self, model: Type[ModelType]):
         self._model = model
 
-    async def get_by_id(self, db: AsyncSession, short_url_id: int) -> Optional[ModelType]:
+    async def get_by_id(
+        self,
+        db: AsyncSession, short_url_id: int,
+    ) -> Optional[ModelType]:
         """
         Получение оригинального URL по его короткому URL.
         """
@@ -56,7 +62,12 @@ class ShortUrlRepositoryDB(Repository, Generic[ModelType, CreateSchemaType, Dele
             )
         return obj_in_db
 
-    async def create(self, db: AsyncSession, *, obj_in: CreateSchemaType) -> ModelType:
+    async def create(
+        self,
+        db: AsyncSession,
+        *,
+        obj_in: CreateSchemaType,
+    ) -> ModelType:
         """
         Создание новой записи.
         """
@@ -102,7 +113,9 @@ class ShortUrlRepositoryDB(Repository, Generic[ModelType, CreateSchemaType, Dele
         if not obj_from_db.full_info:
             obj_from_db.full_info = {}
         full_info = obj_from_db.full_info
-        full_info.update({datetime.now().strftime("%Y-%m-%d %H:%M:%S"): client_ip})
+        full_info.update(
+            {datetime.now().strftime("%Y-%m-%d %H:%M:%S"): client_ip}
+        )
         statement = update(self._model).where(
             self._model.id == obj_from_db.id,
         ).values(full_info=full_info)
