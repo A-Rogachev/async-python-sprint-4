@@ -16,9 +16,6 @@ app = FastAPI(
 app.add_middleware(BlacklistMiddleware, blacklist=app_settings.blacklist)
 app.include_router(base.api_router, prefix='/api/v1') 
 
-# 2. клики по переходу на урл
-# 4. Docker compose и README
-
 
 if __name__ == '__main__':
 
@@ -46,4 +43,3 @@ if __name__ == '__main__':
         reload=True,
         # log_config=LOGGING,
     )
-

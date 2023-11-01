@@ -8,7 +8,10 @@ load_dotenv()
 
 
 class AppSettings(BaseSettings):
-    app_title: str = 'URL Shortener'
+    app_title: str
+    postgres_db: str
+    postgres_user: str
+    postgres_password: str
     database_dsn: PostgresDsn
     blacklist: list[str] = [
         '172.0.0.1',
