@@ -9,7 +9,7 @@ class ShortUrl(Base):
 
     id = Column(Integer, primary_key=True)
     original_url = Column(String, nullable=False)
-    shorten_url = Column(String, nullable=False)
+    shorten_url = Column(String, nullable=False, unique=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     deleted_at = Column(DateTime, nullable=True, default=None)
     total_clicks = Column(Integer, nullable=False, default=0)

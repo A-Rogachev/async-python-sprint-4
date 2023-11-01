@@ -14,8 +14,7 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 app.add_middleware(BlacklistMiddleware, blacklist=app_settings.blacklist)
-app.include_router(base.api_router, prefix='/api/v1') 
-
+app.include_router(base.api_router, prefix='/api/v1')
 
 if __name__ == '__main__':
 

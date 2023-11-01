@@ -62,6 +62,20 @@ class ShortUrlRepositoryDB(
             )
         return obj_in_db
 
+    async def get_by_name(
+        self,
+        db: AsyncSession, short_url_name: int,
+    ) -> Optional[ModelType]:
+        """
+        Получение оригинального URL по его короткому URL.
+        """
+        statement = select(self._model).where(
+            self._model.shorten_url == short_url_name,
+        )
+        results = await db.execute(statement=statement)
+        obj_in_db = results.scalar_one_or_none()
+        return obj_in_db
+
     async def create(
         self,
         db: AsyncSession,

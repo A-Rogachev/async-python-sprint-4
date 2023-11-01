@@ -65,6 +65,16 @@ async def create_shorten_url(
     """
     encrypted_password = sha256_crypt.hash(short_url_in.password_for_deleting)
     short_url_in.password_for_deleting = encrypted_password
+
+    existing_record = await short_url_crud.get_by_name(
+        db=db, short_url_name=short_url_in.shorten_url
+    )
+    if existing_record:
+        raise HTTPException(
+            status_code=400,
+            detail='Record with the same name already exists'
+        )
+
     new_record = await short_url_crud.create(db=db, obj_in=short_url_in)
     return new_record
 
