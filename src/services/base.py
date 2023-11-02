@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Generic, Optional, Type, TypeVar
+from abc import ABC, abstractmethod
 
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
@@ -15,20 +16,16 @@ CreateSchemaType = TypeVar('CreateSchemaType', bound=BaseModel)
 DeleteSchemaType = TypeVar('DeleteSchemaType', bound=BaseModel)
 
 
-class Repository:
+class Repository(ABC):
+    """
+    Абстрактный класс репозитория для работы с БД.
+    """
 
-    def get(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def get_multi(self, *args, **kwargs):
-        raise NotImplementedError
-
+    @abstractmethod
     def create(self, *args, **kwargs):
         raise NotImplementedError
 
-    def update(self, *args, **kwargs):
-        raise NotImplementedError
-
+    @abstractmethod
     def delete(self, *args, **kwargs):
         raise NotImplementedError
 
