@@ -8,11 +8,13 @@ load_dotenv()
 
 
 class AppSettings(BaseSettings):
+    """
+    Настройки приложения.
+    """
+    is_debug: bool
     app_title: str
-    postgres_db: str
-    postgres_user: str
-    postgres_password: str
-    database_dsn: PostgresDsn
+    logging_echo: bool
+    DATABASE_DSN: PostgresDsn
     blacklist: list[str] = [
         '172.0.0.1',
     ]

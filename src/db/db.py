@@ -4,8 +4,8 @@ from sqlalchemy.orm import sessionmaker
 from core.config import app_settings
 
 engine = create_async_engine(
-    str(app_settings.database_dsn),
-    echo=True,
+    str(app_settings.DATABASE_DSN),
+    echo=app_settings.logging_echo,
     future=True,
 )
 async_session = sessionmaker(
