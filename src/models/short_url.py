@@ -3,9 +3,9 @@ from sqlalchemy import Column, DateTime, Integer, JSON, UUID, String
 from .base import Base
 
 
-ORIGINAL_URL_MAX_LENGTH: int = 50
-SHORTEN_URL_MAX_LENGTH: int = 50
-PASSWORD_FOR_DELETING_MAX_LENGTH: int = 50
+ORIGINAL_URL_MAX_LENGTH: int = 255
+SHORTEN_URL_MAX_LENGTH: int = 255
+PASSWORD_FOR_DELETING_MAX_LENGTH: int = 255
 
 
 from sqlalchemy.dialects.postgresql import UUID

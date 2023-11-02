@@ -43,15 +43,16 @@ class ShortUrlRepositoryDB(
     def __init__(self, model: Type[ModelType]):
         self._model = model
 
-    async def get_by_id(
+    async def get_by_short_url(
         self,
-        db: AsyncSession, short_url_id: int,
+        db: AsyncSession,
+        shorten_url: str,
     ) -> Optional[ModelType]:
         """
         Получение оригинального URL по его короткому URL.
         """
         statement = select(self._model).where(
-            self._model.id == short_url_id,
+            self._model.shorten_url == shorten_url,
         )
         results = await db.execute(statement=statement)
         obj_in_db = results.scalar_one_or_none()
@@ -60,20 +61,6 @@ class ShortUrlRepositoryDB(
                 status_code=status.HTTP_410_GONE,
                 detail='Item has been deleted.',
             )
-        return obj_in_db
-
-    async def get_by_name(
-        self,
-        db: AsyncSession, short_url_name: int,
-    ) -> Optional[ModelType]:
-        """
-        Получение оригинального URL по его короткому URL.
-        """
-        statement = select(self._model).where(
-            self._model.shorten_url == short_url_name,
-        )
-        results = await db.execute(statement=statement)
-        obj_in_db = results.scalar_one_or_none()
         return obj_in_db
 
     async def create(

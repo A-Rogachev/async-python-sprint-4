@@ -13,21 +13,21 @@ urls_router = APIRouter()
 
 
 @urls_router.get(
-    '/{short_url_id}/',
+    '/{shorten_url}/',
     response_model=dict[str, Any],
 )
 async def get_original_url(
     request: Request,
-    short_url_id: int,
+    shorten_url: str,
     db: AsyncSession = Depends(get_session),
     status: Optional[str] = None,
 ) -> Any:
     """
     Вернуть оригинальный URL.
     """
-    obj_from_db = await short_url_crud.get_by_id(
+    obj_from_db = await short_url_crud.get_by_short_url(
         db=db,
-        short_url_id=short_url_id,
+        shorten_url=shorten_url,
     )
     if not obj_from_db:
         raise HTTPException(
@@ -64,8 +64,8 @@ async def create_shorten_url(
     encrypted_password = sha256_crypt.hash(short_url_in.password_for_deleting)
     short_url_in.password_for_deleting = encrypted_password
 
-    existing_record = await short_url_crud.get_by_name(
-        db=db, short_url_name=short_url_in.shorten_url
+    existing_record = await short_url_crud.get_by_short_url(
+        db=db, shorten_url=short_url_in.shorten_url
     )
     if existing_record:
         raise HTTPException(
